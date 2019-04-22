@@ -1,13 +1,22 @@
 #!/usr/bin/env bash
 
-echo "starting target"
-node ./test/target.js &
-target_pid=$!
+# set -eu -o pipefail
 
-echo "running tests"
+echo "# starting target"
+&>/dev/null PORT=3003 node ./test/core/targets/simple.js &
+target_pid=$!
+&>/dev/null node ./test/gh_215_target.js &
+target2_pid=$!
+
+echo "# running tests"
 echo
 
-bats ./test/test.sh
+bats --tap ./test/testcases/*.bats
 
-echo "done"
+status=$?
+
+echo "# done"
 kill $target_pid
+kill $target2_pid
+
+exit $status

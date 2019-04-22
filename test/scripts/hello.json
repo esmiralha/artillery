@@ -1,16 +1,17 @@
 {
-  "config": {
-      "target": "http://127.0.0.1:3003",
-      "phases": [
-        {"duration": 10, "arrivalRate": 1}
-      ],
-      "processor": "./processor.js"
-  },
   "scenarios": [
     {
+      "beforeRequest": ["printHello"],
       "flow": [
-        {"get": {"url": "/", "beforeRequest": "printHello"}},
-        {"post": {"url": "/pets", "json": {"name": "Figo", "species": "dog"}}}
+        {"function": "checkGlobal"},
+        {"get": {"url": "/"}},
+        {"post": {"url": "/pets", "json": {"name": "Figo", "species": "dog"}}},
+        {"loop": [
+          {"loop": [
+            {"log": "outer: {{ $loopCount }}; inner: {{ k }}"}
+          ], "count": "5", "loopValue": "k"}
+        ], "count": 3},
+        {"get": {"url": "/does/not/exist", "beforeRequest": "rewriteUrl"}}
       ]
     }
   ]
